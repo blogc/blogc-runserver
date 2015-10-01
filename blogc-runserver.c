@@ -17,6 +17,7 @@
 #include <magic.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -186,6 +187,8 @@ handler(struct evhttp_request *request, void *ptr)
         goto point4;
     }
 
+    bool add_slash = false;
+
     if (S_ISDIR(st.st_mode)) {
         char *found = NULL;
 
@@ -206,6 +209,10 @@ handler(struct evhttp_request *request, void *ptr)
             goto point4;
         }
 
+        size_t path_len = strlen(path);
+        if (path_len > 0 && path[path_len - 1] != '/')
+            add_slash = true;
+
         free(real_path);
         real_path = found;
     }
@@ -224,6 +231,17 @@ handler(struct evhttp_request *request, void *ptr)
     }
 
     struct evkeyvalq *headers = evhttp_request_get_output_headers(request);
+
+    if (add_slash) {
+        char *tmp = b_strdup_printf("%s/", path);
+        evhttp_add_header(headers, "Location", tmp);
+        free(tmp);
+        // production webservers usually returns 301 in such cases, but 302 is
+        // better for development/testing.
+        evhttp_send_reply(request, 302, "Found", NULL);
+        goto point5;
+    }
+
     evhttp_add_header(headers, "Content-Type", type);
     char *content_length = b_strdup_printf("%zu", st.st_size);
     evhttp_add_header(headers, "Content-Length", content_length);
