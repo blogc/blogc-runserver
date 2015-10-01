@@ -107,6 +107,8 @@ guess_content_type(const char *filename, int fd)
 
     // try "supported" types first, and just use libmagic for charset
     const char *extension = get_extension(filename);
+    if (extension == NULL)
+        goto libmagic;
     const char *supported = NULL;
     for (unsigned int i = 0; content_types[i].extension != NULL; i++)
         if (0 == strcmp(content_types[i].extension, extension))
@@ -121,6 +123,8 @@ guess_content_type(const char *filename, int fd)
         }
         return strdup(supported);
     }
+
+libmagic:
 
     // fallback to use libmagic for everything
     newfd = dup(fd);
