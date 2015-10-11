@@ -3,7 +3,7 @@ AC_PREREQ([2.69])
 AC_INIT([blogc-runserver], [0.1], [https://github.com/blogc/blogc-runserver])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.13 foreign no-dist-gzip dist-xz subdir-objects serial-tests])
+AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects serial-tests])
 AC_CONFIG_HEADERS([config.h])
 AM_SILENT_RULES([yes])
 AM_MAINTAINER_MODE([enable])
