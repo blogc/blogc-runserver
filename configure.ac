@@ -15,10 +15,13 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
   AC_MSG_ERROR([no C99 compiler found, blogc-runserver requires a C99 compiler.])
 ])
 
-AC_CHECK_HEADERS([signal.h stdarg.h fcntl.h unistd.h sys/stat.h sys/types.h], [],
-  [unable to find some required header])
+AC_CHECK_HEADERS([signal.h stdarg.h fcntl.h unistd.h sys/stat.h sys/types.h], , [
+  AC_MSG_ERROR([unable to find some required header])
+])
 
-AC_CHECK_HEADERS([magic.h], [], [unable to find libmagic headers])
+AC_CHECK_HEADERS([magic.h], , [
+  AC_MSG_ERROR([unable to find libmagic headers])
+])
 
 AC_CHECK_LIB(magic, [magic_open], [MAGIC_LIBS="-lmagic"], [
   AC_MSG_ERROR([unable to find libmagic])
