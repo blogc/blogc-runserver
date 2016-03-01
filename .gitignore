@@ -32,9 +32,17 @@ Makefile.in
 /stamp-h1
 .dirstamp
 /build-aux/*
+!/build-aux/git-version-gen
+
+# installed .m4 files
+/m4/*.m4
+!/m4/pkg.m4
 
 # binary
 /blogc-runserver
 
 # tarballs
 blogc-runserver-*.tar.*
+
+# git-version-gen
+/.version

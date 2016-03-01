@@ -26,37 +26,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-
-static char*
-b_strdup_vprintf(const char *format, va_list ap)
-{
-    va_list ap2;
-    va_copy(ap2, ap);
-    int l = vsnprintf(NULL, 0, format, ap2);
-    va_end(ap2);
-    if (l < 0)
-        return NULL;
-    char *tmp = malloc(l + 1);
-    if (!tmp)
-        return NULL;
-    int l2 = vsnprintf(tmp, l + 1, format, ap);
-    if (l2 < 0) {
-        free(tmp);
-        return NULL;
-    }
-    return tmp;
-}
-
-
-static char*
-b_strdup_printf(const char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
-    char *tmp = b_strdup_vprintf(format, ap);
-    va_end(ap);
-    return tmp;
-}
+#include <squareball.h>
 
 
 /**
@@ -120,9 +90,9 @@ guess_content_type(const char *filename, int fd)
             const char* charset = magic_descriptor(magic_charset, newfd);
             close(newfd);
             if (charset != NULL)
-                return b_strdup_printf("%s; charset=%s", supported, charset);
+                return sb_strdup_printf("%s; charset=%s", supported, charset);
         }
-        return strdup(supported);
+        return sb_strdup(supported);
     }
 
 libmagic:
@@ -133,9 +103,9 @@ libmagic:
         const char* content_type = magic_descriptor(magic_all, newfd);
         close(newfd);
         if (content_type != NULL)
-            return strdup(content_type);
+            return sb_strdup(content_type);
     }
-    return strdup("application/octet-stream");
+    return sb_strdup("application/octet-stream");
 }
 
 
@@ -161,7 +131,7 @@ handler(struct evhttp_request *request, void *ptr)
         goto point1;
     }
 
-    char *abs_path = b_strdup_printf("%s/%s", root, decoded_path);
+    char *abs_path = sb_strdup_printf("%s/%s", root, decoded_path);
     char *real_path = realpath(abs_path, NULL);
     free(abs_path);
 
@@ -195,10 +165,10 @@ handler(struct evhttp_request *request, void *ptr)
         for (unsigned int i = 0; content_types[i].mimetype != NULL; i++) {
             if (content_types[i].index == NULL)
                 continue;
-            char *f = b_strdup_printf("%s/%s", real_path,
+            char *f = sb_strdup_printf("%s/%s", real_path,
                 content_types[i].index);
             if (0 == access(f, F_OK)) {
-                found = strdup(f);
+                found = sb_strdup(f);
                 break;
             }
             free(f);
@@ -233,7 +203,7 @@ handler(struct evhttp_request *request, void *ptr)
     struct evkeyvalq *headers = evhttp_request_get_output_headers(request);
 
     if (add_slash) {
-        char *tmp = b_strdup_printf("%s/", path);
+        char *tmp = sb_strdup_printf("%s/", path);
         evhttp_add_header(headers, "Location", tmp);
         free(tmp);
         // production webservers usually returns 301 in such cases, but 302 is
@@ -243,7 +213,7 @@ handler(struct evhttp_request *request, void *ptr)
     }
 
     evhttp_add_header(headers, "Content-Type", type);
-    char *content_length = b_strdup_printf("%zu", st.st_size);
+    char *content_length = sb_strdup_printf("%zu", st.st_size);
     evhttp_add_header(headers, "Content-Length", content_length);
     free(content_length);
 
@@ -346,9 +316,9 @@ main(int argc, char **argv)
                     goto cleanup;
                 case 't':
                     if (argv[i][2] != '\0')
-                        host = strdup(argv[i] + 2);
+                        host = sb_strdup(argv[i] + 2);
                     else
-                        host = strdup(argv[++i]);
+                        host = sb_strdup(argv[++i]);
                     break;
                 case 'p':
                     if (argv[i][2] != '\0')
@@ -373,7 +343,7 @@ main(int argc, char **argv)
                 goto cleanup;
             }
             args++;
-            docroot = strdup(argv[i]);
+            docroot = sb_strdup(argv[i]);
         }
     }
 
@@ -386,7 +356,7 @@ main(int argc, char **argv)
     }
 
     if (host == NULL)
-        host = strdup("127.0.0.1");
+        host = sb_strdup("127.0.0.1");
 
     magic_all = magic_open(MAGIC_MIME);
     magic_charset = magic_open(MAGIC_MIME_ENCODING);
