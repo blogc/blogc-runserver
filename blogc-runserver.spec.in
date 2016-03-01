@@ -8,6 +8,7 @@ URL: @PACKAGE_URL@
 Source0: https://github.com/blogc/blogc-runserver/releases/download/v%{version}/blogc-runserver-%{version}.tar.xz
 
 BuildRequires: squareball-devel, libevent-devel >= 2.0, file-devel
+Requires: file-libs
 
 %description
 blogc-runserver is a simple HTTP server to test blogc websites
