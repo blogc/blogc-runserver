@@ -61,6 +61,7 @@ AM_CONDITIONAL(INTERNAL_SQUAREBALL, [test "x$with_squareball" != "xsystem"])
 
 AC_CONFIG_FILES([
   Makefile
+  blogc-runserver.spec
 ])
 AC_OUTPUT
 

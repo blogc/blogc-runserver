@@ -44,5 +44,9 @@ Makefile.in
 # tarballs
 blogc-runserver-*.tar.*
 
+# rpms
+blogc-runserver.spec
+blogc-runserver-*.rpm
+
 # git-version-gen
 /.version

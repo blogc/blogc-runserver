@@ -1,0 +1,38 @@
+Name: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Release: 1%{?dist}
+License: BSD
+Group: Development/Tools
+Summary: A simple HTTP server to test blogc websites
+URL: @PACKAGE_URL@
+Source0: https://github.com/blogc/blogc-runserver/releases/download/v%{version}/blogc-runserver-%{version}.tar.xz
+
+BuildRequires: squareball-devel, libevent-devel >= 2.0, file-devel
+
+%description
+blogc-runserver is a simple HTTP server to test blogc websites
+
+%prep
+%setup -q
+
+
+%build
+%configure --with-squareball=system
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%make_install
+
+
+%files
+%{_bindir}/blogc-runserver
+
+%doc README.md
+%license LICENSE
+
+
+%changelog
+* Fri Oct 2 2015 Rafael G. Martins <rafael@rafaelmartins.eng.br> 0.1-1
+- Initial package.
